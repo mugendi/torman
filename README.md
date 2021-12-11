@@ -1,8 +1,5 @@
 
-![Logo](https://repository-images.githubusercontent.com/437280242/9e8e3e21-bdcb-4ca5-92bc-4427ef3f3031 |width=200)
-
-Logo by [DesignEvo logo maker](https://www.designevo.com/)
-
+<img src="https://repository-images.githubusercontent.com/437280242/9e8e3e21-bdcb-4ca5-92bc-4427ef3f3031" width=300  />
 
 # What
 This script allows you to initialize multiple TOR instances and proxy to them using an API.
@@ -83,6 +80,6 @@ You can pass arguments to fine tune how torman works.
 1. Stopping Torman using the **--stop** argument stops all running TOR and Torman instances. This includes any TOR processes not initiated by Torman. You might need to manually restart them, if any. That said, why would you be running TOR processes manually when you have Torman?
 
 
-
-
+___
+<sub>Logo created by <a href="https://www.designevo.com/" title="Free Online Logo Maker">DesignEvo logo maker</a></sub>
 
