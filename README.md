@@ -33,22 +33,22 @@ This confirms that Torman is ready and runnibng on the *default port* **6930**. 
 
 
 ```sh
-    curl --request GET \
-      --url http://127.0.0.1:6930/ \
-      --header 'Content-Type: application/json' \
-      --data '{"url" : "https://ipinfo.tw/ip"}'
+curl --request GET \
+  --url http://127.0.0.1:6930/ \
+  --header 'Content-Type: application/json' \
+  --data '{"url" : "https://ipinfo.tw/ip"}'
 ```
 
 This should return a response showing your current TOR IP address.
 
 ```json
-    {
-      "meta": {
-        "proxy": "socks5://127.0.0.1:9080",
-        "took": "773ms"
-      },
-      "response": "185.220.101.44"
-    }
+{
+  "meta": {
+    "proxy": "socks5://127.0.0.1:9080",
+    "took": "773ms"
+  },
+  "response": "185.220.101.44"
+}
 ```
 This shows the proxy port used, the response as well as how long it took to get the response. Repeat the CURL command and note that the TOR proxies keep getting rotated with each proxy call.
 
