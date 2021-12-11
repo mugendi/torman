@@ -36,9 +36,7 @@ This confirms that Torman is ready and runnibng on the *default port* **6930**. 
     curl --request GET \
       --url http://127.0.0.1:6930/ \
       --header 'Content-Type: application/json' \
-      --data '{
-    	"url" : "https://ipinfo.tw/ip"
-        }'
+      --data '{"url" : "https://ipinfo.tw/ip"}'
 ```
 
 This should return a response showing your current TOR IP address.
