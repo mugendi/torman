@@ -152,6 +152,7 @@ def get_tor_session(proxy):
 
 def debug(level, *args):
     
+    
     if ARGS.verbose:
         
         print_str = '{}'.format(' '.join([str(i) for i in args]))        
@@ -181,20 +182,34 @@ def fetch_url(url):
     
     return resp, proxy
 
-def running_tors():
-    # lsof -i -P -n | grep tor
-    cmd = 'lsof -i -P -n'
-    ls = cmd.split()
-    # print(cmd)
-    
-    process = subprocess.run(ls, stdout=subprocess.PIPE)    
-    process = subprocess.run(['grep','tor'], stdout=subprocess.PIPE, input=process.stdout)
+def grep_pids(pc_name):
+    process = subprocess.run(['lsof','-i', '-P', '-n'], stdout=subprocess.PIPE)    
+    process = subprocess.run(['grep', "^{}\s".format(pc_name)], stdout=subprocess.PIPE, input=process.stdout)
     resp_str = process.stdout.decode('utf-8')
     
+    pattern1 = re.compile(r'^{}\s+([0-9]+)'.format(pc_name))
+    
+    pids = []
+    
+    for line in re.split("[\r\n]",resp_str):
+        arr = pattern1.split(line)
+        
+        if len(arr) == 3 :
+            pid = int(arr[1])            
+            if pid not in pids:
+                pids.append( pid )
+            
+    
+    return pids
+
+def running_tors():
+    
+    pids = grep_pids('tor')
+
+
+    
     running = {
-        'process':{
-            'pid':None,
-        }  ,      
+        'processes':[],      
         'instances':{
             'count' : 0,
             'ports':[],
@@ -202,48 +217,42 @@ def running_tors():
         }
         
     }
+    ps = []
     
-    
-    pattern1 = re.compile(r'^tor\s+([0-9]+).+?\(LISTEN\)')
-    p = None
-    
-    for line in re.split("[\r\n]",resp_str):
-        arr = pattern1.split(line)
-                
-        if len(arr) == 3:  
+    for pid in pids:
+            
+        p = psutil.Process( pid )        
+        p_dict = p.as_dict()
         
-            p = psutil.Process( int(arr[1]) )        
-            p_dict = p.as_dict()
+        ps.append(p)
+        
+        # running['terminate']=p.terminate       
+        
+        running['processes'].append( {                
+            'name' : p_dict['name'],
+            'status' : p_dict['status'],
+            'pid' : p_dict['pid'],
+            'memory_percent' : p_dict['memory_percent'] * 100,
             
-            # running['terminate']=p.terminate
-            
-            
-            running['process'] = {                
-                'name' : p_dict['name'],
-                'status' : p_dict['status'],
-                'pid' : p_dict['pid'],
-                'memory_percent' : p_dict['memory_percent'] * 100,
-                
-                'cwd' : p_dict['cwd'],
-                'cpu_num' : p_dict['cpu_num'],
-                'create_time' : p_dict['create_time']
-            }
-            
-            # pprint(p_dict)
-            
-            for conn in p_dict['connections']:            
-                if conn.status=='LISTEN':
-                    if(conn.laddr.ip=='0.0.0.0'):
-                        running['instances']['ports'].append(conn.laddr.port)
-                        running['instances']['count'] += 1
-                    else:
-                        running['instances']['control_ports'].append(conn.laddr.port)
-                        
+            'cwd' : p_dict['cwd'],
+            'cpu_num' : p_dict['cpu_num'],
+            'create_time' : p_dict['create_time']
+        })
+        
+        # pprint(p_dict)
+        
+        for conn in p_dict['connections']:            
+            if conn.status=='LISTEN':
+                if(conn.laddr.ip=='0.0.0.0'):
+                    running['instances']['ports'].append(conn.laddr.port)
+                    running['instances']['count'] += 1
+                else:
+                    running['instances']['control_ports'].append(conn.laddr.port)
                     
-            break
-                
+    
+    # print(running)
 
-    return running, p
+    return running, ps
 
 def start_tor(requests, password, instances=4):
     
@@ -268,31 +277,6 @@ def start_tor(requests, password, instances=4):
     # get ports
     if len(ports) == 0:
         ports = get_ports()
-        
-#     print('''                              
-# ┌──────────────────────────────────────────┐                      
-# └──┐  ┌────────────────────────────────────┘ 
-#    │  │   ____    ___  _____ ____    ____
-#    │  │  /  _ \_/ __ \/     \\__     /     \ 
-#    │  │ (  (_) )  | \/  Y Y  \/ __ \|   |  \ 
-#    │  │  \____/|__|  |__|_|  (____  /___|  /
-#    └──┘                    \/     \/     \/ 
-   
-#        _            _            _          _   _         _                   _          
-#       /\ \         /\ \         /\ \       /\_\/\_\ _    / /\                /\ \     _  
-#       \_\ \       /  \ \       /  \ \     / / / / //\_\ / /  \              /  \ \   /\_\
-#       /\__ \     / /\ \ \     / /\ \ \   /\ \/ \ \/ / // / /\ \            / /\ \ \_/ / /
-#      / /_ \ \   / / /\ \ \   / / /\ \_\ /  \____\__/ // / /\ \ \          / / /\ \___/ / 
-#     / / /\ \ \ / / /  \ \_\ / / /_/ / // /\/________// / /  \ \ \        / / /  \/____/  
-#    / / /  \/_// / /   / / // / /__\/ // / /\/_// / // / /___/ /\ \      / / /    / / /   
-#   / / /      / / /   / / // / /_____// / /    / / // / /_____/ /\ \    / / /    / / /    
-#  / / /      / / /___/ / // / /\ \ \ / / /    / / // /_________/\ \ \  / / /    / / /     
-# /_/ /      / / /____\/ // / /  \ \ \\/_/    / / // / /_       __\ \_\/ / /    / / /      
-# \_\/       \/_________/ \/_/    \_\/        \/_/ \_\___\     /____/_/\/_/     \/_/  
-#    ┌                                   ┐
-#    │  Manage TOR Proxies like a Boss!  │
-#    └                                   ┘
-#    ''')
 
     print(''',---------.    ,-----.    .-------.    ,---.    ,---.   ____    ,---.   .--. 
 \          \ .'  .-,  '.  |  _ _   \   |    \  /    | .'  __ `. |    \  |  | 
@@ -312,19 +296,36 @@ def start_tor(requests, password, instances=4):
     
     
  
-def stop_tor():
-    
-    debug("critical","Stopping TOR...")
+def stop_tor():    
     
     # global tor_process    
-    tor_status , tor_process = running_tors()
-    # 
-    if tor_process:    
-        # print(tor_status)
-        print("Stopping {} with PID:{}".format(tor_status['process']['name'], tor_status['process']['pid']))
+    tor_status , tor_processes = running_tors()    
+    
+    for tor_process in tor_processes:
+        
+        index = tor_processes.index(tor_process)
+        
+        status = tor_status['processes'][index]
+        
+        debug("warning","Stopping {} with PID:{}".format(status['name'], status['pid']))
         # print(tor_process)
         tor_process.terminate()
 
+
+def stop():
+        
+    # stop all tor processes
+    stop_tor()    
+    # stop all torman processes
+    pids = grep_pids('torman')
+    
+    if len(pids)>0:
+        pids = [str(i) for i in pids]
+        cmd = "kill -9 {}".format(' '.join(pids))
+        
+        debug("warning","Stopping Torman process with PIDS: {}".format(', '.join(pids)))
+        
+        os.system(cmd) 
 
 
 def start():
@@ -354,7 +355,7 @@ def start():
     
     # If stop
     if args.stop:
-        stop_tor()
+        stop()
         
             
     else:    
