@@ -1,6 +1,5 @@
 
-#What
-
+# What
 This script allows you to initialize multiple TOR instances and proxy to them using an API.
 
 The script automatically refreshes TOR IP's after a number of calls through each TOR Socket.
