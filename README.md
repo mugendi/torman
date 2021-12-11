@@ -1,5 +1,7 @@
 
+<p align="center">
 <img src="https://repository-images.githubusercontent.com/437280242/9e8e3e21-bdcb-4ca5-92bc-4427ef3f3031" width=300  />
+</p>
 
 # What
 This script allows you to initialize multiple TOR instances and proxy to them using an API.
