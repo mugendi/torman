@@ -14,7 +14,7 @@
 
 from setuptools import setup, find_packages
 
-VERSION = '0.0.4' 
+VERSION = '0.0.5' 
 DESCRIPTION = 'Initialize multiple TOR instances and proxy to them using an API'
 
 with open("README.md", "r") as f:
@@ -33,7 +33,7 @@ setup(
         long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',
         packages=find_packages(),
-        install_requires=[], # add any additional packages that 
+        install_requires=['psutil', 'coloredlogs', 'waitress', 'fastcore'], # add any additional packages that 
         # needs to be installed along with your package. Eg: 'caer'
         
         keywords=['python', 'tor', 'manager', 'proxy', 'multiple', 'anonymous'],
