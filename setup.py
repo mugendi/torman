@@ -27,8 +27,8 @@ setup(
        # the name must match the folder name 'verysimplemodule'
         name="torman", 
         version=VERSION,
-        author="Jason Dsouza",
-        author_email="<youremail@email.com>",
+        author="Anthony Mugendi",
+        author_email="ngurumugz@gmail.com",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         packages=find_packages(),
@@ -36,17 +36,23 @@ setup(
         # needs to be installed along with your package. Eg: 'caer'
         
         keywords=['python', 'tor', 'manager', 'proxy', 'multiple', 'anonymous'],
+        license='Apache License 2.0',
+        platforms='any',
         
         entry_points = {
             'console_scripts': ['torman=torman:main'],
         },
         
         classifiers= [
-            "Development Status :: 3 - Alpha",
-            "Intended Audience :: Education",
-            "Programming Language :: Python :: 2",
-            "Programming Language :: Python :: 3",
-            "Operating System :: MacOS :: MacOS X",
-            "Operating System :: Microsoft :: Windows",
+            'Development Status :: 5 - Production/Stable',
+            'Intended Audience :: Developers',
+            'Intended Audience :: System Administrators',
+            'Intended Audience :: Telecommunications Industry',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python :: 2',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: Implementation :: PyPy',
+            'Topic :: Internet',
+            'Topic :: System :: Networking',
         ]
 )
