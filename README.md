@@ -5,7 +5,10 @@ This script allows you to initialize multiple TOR instances and proxy to them us
 The script automatically refreshes TOR IP's after a number of calls through each TOR Socket.
 
 # Running
-To run Torman simply go to your console and type **```torman```**
+
+To run Torman simply go to your console and type:
+
+```$ torman```
 
 You should see the following output.
 
