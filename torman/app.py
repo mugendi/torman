@@ -149,7 +149,7 @@ def cycle_proxy():
     # print(port_usage, least_used_port)
     
     # make Proxy URL
-    return 'socks5://127.0.0.1:{}'.format(least_used_port), least_used_port
+    return 'socks5://127.0.0.1:{}'.format(least_used_port), least_used_port, port_usage[least_used_port]
 
      
 def get_tor_session(proxy):
@@ -186,13 +186,15 @@ def debug(level, *args):
 def fetch_url(url):
     
     # get random proxy
-    proxy, port = cycle_proxy()
+    proxy, port, remaining = cycle_proxy()
+    
+    print(proxy, port, remaining)
     
     session = get_tor_session(proxy)    
     
     resp = session.get(url).text.strip()
     
-    return resp, proxy
+    return resp, port, remaining
 
 def grep_pids(pc_name):
     process = subprocess.run(['lsof','-i', '-P', '-n'], stdout=subprocess.PIPE)    
@@ -391,7 +393,7 @@ def start():
             
             debug("info", "PROXY Loading", url)
             
-            resp, port = fetch_url(url)
+            resp, port, remaining = fetch_url(url)
             
             took = timeExec('fetchPage')
             
@@ -400,7 +402,10 @@ def start():
             response = {
                 'meta': {
                     'took' : took ,
-                    'proxy': port
+                    'proxy': {
+                        "port" : port,
+                        "remaining-requests" : remaining
+                    }
                 },
                 'response': resp
             }

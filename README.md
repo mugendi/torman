@@ -52,13 +52,16 @@ This should return a response showing your current TOR IP address.
 ```json
 {
   "meta": {
-    "proxy": "socks5://127.0.0.1:9080",
-    "took": "773ms"
+    "proxy": {
+      "port": 9060,
+      "remaining-requests": 49
+    },
+    "took": "367ms"
   },
-  "response": "185.220.101.44"
+  "response": "185.220.101.170"
 }
 ```
-This shows the proxy port used, the response as well as how long it took to get the response. Repeat the CURL command and note that the TOR proxies keep getting rotated with each proxy call.
+This shows the proxy port used, remaining-requests till the IP refreshes, the response as well as how long it took to get the response. Repeat the CURL command and note that the TOR proxies keep getting rotated with each proxy call.
 
 # API
 You can pass arguments to fine tune how torman works.
