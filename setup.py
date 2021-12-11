@@ -14,7 +14,7 @@
 
 from setuptools import setup, find_packages
 
-VERSION = '0.0.2' 
+VERSION = '0.0.3' 
 DESCRIPTION = 'Initialize multiple TOR instances and proxy to them using an API'
 
 with open("README.md", "r") as f:

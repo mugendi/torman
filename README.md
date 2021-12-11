@@ -68,7 +68,7 @@ You can pass arguments to fine tune how torman works.
 - **--refresh-after** Number of requests after which the TOR IP gets refreshed. You must provide a control passwoerd for this to work. Defaults to 50 requests.
 - **--control-pass** Your TOR control password. Used to renew TOR IPs when **refresh-after** value has been reached.
 - **--server** The port through which Torman listens for REST API requests. Default is 6930
-- **--instances** Number of TOR instances to initiate. Default is 4. Torman will allocate requests to these instances randomly.
+- **--instances** Number of TOR instances to initiate. Default is 4. Torman will cycle through the TOR instances and allocate requests to each.
 - **--stop** Stop Torman and all TOR instances.
 - **--verbose** Show/Log API requests
 

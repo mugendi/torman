@@ -20,6 +20,7 @@ import sys
 import subprocess
 import psutil
 
+from collections import Counter
 from getpass import getpass
 from flask import abort, Flask, jsonify, request
 from Utils import timeExec, sudo_process, is_absolute_url, pprint, logger
@@ -38,11 +39,15 @@ class args:
 
 ARGS = args()
 
-
+max_requests = 10
+ports = []
+port_usage = {}
 
 def get_ports():
 
     global ports_file
+    global max_requests
+    global port_usage
     
     with open(ports_file, 'r') as file:
         data = file.read()
@@ -56,8 +61,10 @@ def get_ports():
         for line in re.split("[\r\n]",data):    
             arr = pattern1.split(line)
             
-            if len(arr)==3:        
-                SOCKPorts.append(int(arr[1]))
+            if len(arr)==3:   
+                port = int(arr[1])     
+                SOCKPorts.append(port)
+                port_usage[port]= max_requests
                 
         for line in re.split("[\r\n]",data):  
             arr = pattern2.split(line)
@@ -89,9 +96,8 @@ def make_torrc_file(instances_count=4):
     Path(ports_file).mk_write('{}\n{}'.format( '\n'.join(ports) , '\n'.join(control_ports)) )
 
 
-ports = []
-port_usage = {}
-max_requests = 10
+
+
 control_password=''
 
 tor_status={}
@@ -116,30 +122,36 @@ def reset_pass(port, password):
     # execute command
     os.system(cmd)    
 
-def random_proxy():
+
+
+def cycle_proxy():
     global ports
     global control_password
     global max_requests
     
-    random_port = random.choice(ports['SOCKPorts'])
-    port_index = ports['SOCKPorts'].index(random_port)
+    # Get the least used port
+    c=Counter(port_usage)
+    l = c.most_common()
     
+    least_used_port = l[0][0]
+    port_index = ports['SOCKPorts'].index(least_used_port)    
     
     # if control port password and value is zero, reload and reset port
-    if control_password != None and port_usage.get(random_port) != None and port_usage[random_port] == 0 :   
-        port_usage[random_port] =  max_requests
+    if control_password != None and port_usage.get(least_used_port) != None and port_usage[least_used_port] == 0 :   
+        port_usage[least_used_port] =  max_requests
         reset_pass( ports['ControlPorts'][port_index] , control_password)
     
-    if port_usage.get(random_port)==None:
-        port_usage[random_port] =  max_requests
+    if port_usage.get(least_used_port)==None:
+        port_usage[least_used_port] =  max_requests
     else:
-        port_usage[random_port] = port_usage[random_port] - 1        
+        port_usage[least_used_port] = port_usage[least_used_port] - 1        
     
-    # print(port_usage, random_port)
+    # print(port_usage, least_used_port)
     
     # make Proxy URL
-    return 'socks5://127.0.0.1:{}'.format(random_port), random_port
-        
+    return 'socks5://127.0.0.1:{}'.format(least_used_port), least_used_port
+
+     
 def get_tor_session(proxy):
     
     # print("proxy", proxy)
@@ -174,7 +186,7 @@ def debug(level, *args):
 def fetch_url(url):
     
     # get random proxy
-    proxy, port = random_proxy()
+    proxy, port = cycle_proxy()
     
     session = get_tor_session(proxy)    
     
