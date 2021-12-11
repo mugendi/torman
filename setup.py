@@ -17,10 +17,18 @@ from setuptools import setup, find_packages
 VERSION = '0.0.5' 
 DESCRIPTION = 'Initialize multiple TOR instances and proxy to them using an API'
 
+# Get Long Desc
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
 
-# LONG_DESCRIPTION = 'My first Python package with a slightly longer description'
+# Get all requirements
+with open('requirements.txt', 'r') as f:
+    INSTALL_REQS = [
+        s for s in [
+            line.split('#', 1)[0].strip(' \t\n') for line in f
+        ] if s != ''
+    ]
+    
 
 # Setting up
 setup(
@@ -33,8 +41,7 @@ setup(
         long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',
         packages=find_packages(),
-        install_requires=['psutil', 'coloredlogs', 'waitress', 'fastcore'], # add any additional packages that 
-        # needs to be installed along with your package. Eg: 'caer'
+        install_requires=INSTALL_REQS
         
         keywords=['python', 'tor', 'manager', 'proxy', 'multiple', 'anonymous'],
         license='Apache License 2.0',
