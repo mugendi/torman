@@ -74,6 +74,9 @@ You can pass arguments to fine tune how torman works.
 2. ```torman --refresh-after 10 --control-pass my_pass``` refresh after 10 TOR requests wusing "my_pass" as the control password
 
 
+# Beware!
+1. Stopping Torman using the **--stop** argument stops all running TOR and Torman instances. This includes any TOR processes not initiated by Torman. You might need to manually restart them if any. 
+
 
 
 
