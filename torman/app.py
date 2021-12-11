@@ -75,40 +75,59 @@ def get_ports():
         
         return {'SOCKPorts':SOCKPorts, 'ControlPorts':ControlPorts}
 
-def make_torrc_file(instances_count=4):
-    ports = []
-    control_ports = []
-    starting_port = 9060
-
-    while len(ports) < instances_count:
-        
-        control_port = starting_port+1   
-        
-        # if  is_free_port(starting_port) and  is_free_port(control_port) :
-        
-        ports.append(f"SOCKSPort 0.0.0.0:{starting_port}")
-        control_ports.append(f"ControlPort {control_port}")
-        
-        starting_port += 10
-        
-        
-    # Use fastutils to create and write ports file
-    Path(ports_file).mk_write('{}\n{}'.format( '\n'.join(ports) , '\n'.join(control_ports)) )
-
-
-
-
-control_password=''
-
-tor_status={}
-tor_process= None
-
   
  
 def is_free_port(port):
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) != 0
+
+
+def next_free_port(start):
+    
+    port = start + 1;
+    
+    while is_free_port(port) == False:
+        port += 1
+    
+    # Keep ports within managebale range
+    if port > 9999:
+        raise Exception("Unable to start TOR process with port  {}".format(port))
+    
+    return port
+
+
+# exit()
+
+
+def make_torrc_file(instances_count=4):
+    
+    starting_port = 4230
+    ports = []
+    control_ports = []
+    
+
+    while len(ports) < instances_count:
+        
+        # control_port = starting_port+1  
+        starting_port = next_free_port(starting_port) 
+                
+        ports.append(f"SOCKSPort 0.0.0.0:{starting_port}")
+        
+        starting_port = next_free_port(starting_port)
+        
+        control_ports.append(f"ControlPort {starting_port}")
+        
+        
+        
+    # Use fastutils to create and write ports file
+    Path(ports_file).mk_write('{}\n{}'.format( '\n'.join(ports) , '\n'.join(control_ports)) )
+
+control_password=''
+
+tor_status={}
+tor_process= None
+
 
 def reset_pass(port, password):
     
@@ -187,8 +206,6 @@ def fetch_url(url):
     
     # get random proxy
     proxy, port, remaining = cycle_proxy()
-    
-    print(proxy, port, remaining)
     
     session = get_tor_session(proxy)    
     
@@ -364,7 +381,6 @@ def start():
     args = parser.parse_args()
     
     ARGS = args
-    
     
     
     # If stop
