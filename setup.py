@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from setuptools import setup, find_packages
 
 VERSION = '0.0.5' 
@@ -41,7 +42,7 @@ setup(
         long_description=LONG_DESCRIPTION,
         long_description_content_type='text/markdown',
         packages=find_packages(),
-        install_requires=INSTALL_REQS
+        install_requires=INSTALL_REQS,
         
         keywords=['python', 'tor', 'manager', 'proxy', 'multiple', 'anonymous'],
         license='Apache License 2.0',
