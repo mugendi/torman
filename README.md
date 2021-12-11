@@ -75,7 +75,7 @@ You can pass arguments to fine tune how torman works.
 
 
 # Beware!
-1. Stopping Torman using the **--stop** argument stops all running TOR and Torman instances. This includes any TOR processes not initiated by Torman. You might need to manually restart them if any. 
+1. Stopping Torman using the **--stop** argument stops all running TOR and Torman instances. This includes any TOR processes not initiated by Torman. You might need to manually restart them, if any. That said, why would you be running TOR processes manually when you have Torman?
 
 
 
