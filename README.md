@@ -6,9 +6,10 @@ The script automatically refreshes TOR IP's after a number of calls through each
 
 # Running
 
-First install Torman with ```pip install torman``` then type:
+To get started with Torman:
 
-```$ torman```
+- Install with pip: ```$ pip install torman``` 
+- Then Start: ```$ torman```
 
 You should see the following output.
 
